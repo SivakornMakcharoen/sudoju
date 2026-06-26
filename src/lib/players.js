@@ -46,9 +46,7 @@ export async function savePlayer(player) {
   if (error) console.error('savePlayer error', error);
 }
 
-/**
- * Fetch all players (for leaderboard).
- */
+
 export async function fetchAllPlayers() {
   const { data, error } = await db.from('players').select('email, name, stats');
   if (error || !data) return [];
@@ -59,9 +57,6 @@ export async function fetchAllPlayers() {
   }));
 }
 
-/**
- * Get top-N players for a given level, sorted by best time.
- */
 export function topForLevel(players, level, n = 3) {
   return players
     .filter(u => {

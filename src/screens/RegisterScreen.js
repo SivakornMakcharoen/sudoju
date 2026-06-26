@@ -17,7 +17,7 @@ export function RegisterScreen({ onSuccess }) {
       <div class="error-msg" id="reg-error"></div>
       <button class="btn full" id="btn-start">เริ่มเล่น</button>
       <div class="hint" style="margin-top:10px;">
-        ถ้าเคยลงทะเบียนด้วยอีเมลนี้แล้ว ระบบจะดึงข้อมูล/สถิติเดิมของคุณกลับมาให้อัตโนมัติ
+        version 1.1.2
       </div>
     </div>
     <div class="foot-note">

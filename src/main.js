@@ -27,8 +27,7 @@ function App() {
   }
 
   function showRegister(switchPlayer = false) {
-    if (switchPlayer) clearSession();   // clear เฉพาะตอน switch player จริงๆ
-    // บันทึก screen ปัจจุบันไว้ใน session (ถ้ามี player อยู่แล้ว)
+    if (switchPlayer) clearSession();  
     const cur = loadSession();
     if (cur) saveSession({ ...cur, _screen: 'register' });
 
@@ -39,7 +38,6 @@ function App() {
   }
 
   function showLevel(player) {
-    // บันทึกว่าอยู่หน้า level
     saveSession({ ...player, _screen: 'level' });
     const screen = LevelScreen({
       player,
@@ -49,7 +47,6 @@ function App() {
   }
 
   function showGame(player) {
-    // บันทึกว่าอยู่หน้า game
     saveSession({ ...player, _screen: 'game' });
     const screen = GameScreen({
       player,
@@ -60,7 +57,7 @@ function App() {
     screen.start();
   }
 
-  // ── Boot: เช็ค session และ screen ก่อน ──
+
   const saved = loadSession();
   const screen = saved?._screen;
 
@@ -71,8 +68,6 @@ function App() {
   } else if (screen === 'level' || (saved && !saved.level)) {
     showLevel(saved);
   } else if (screen === 'register') {
-    // ถ้า refresh ตอนอยู่หน้า register ให้กลับไปหน้านั้น
-    // แต่ไม่ clear session เพราะ player อาจมีอยู่แล้ว
     showRegister();
   } else if (saved.level) {
     showGame(saved);
