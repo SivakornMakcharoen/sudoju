@@ -102,9 +102,9 @@ body {
 .cell  { background: var(--paper-card); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: clamp(16px, 4vw, 22px); font-weight: 500; cursor: pointer; user-select: none; color: var(--ink); position: relative; }
 .cell.given         { font-weight: 700; cursor: default; background-color: var(--given-bg); color: var(--ink); }
 .cell.user          { background: var(--paper-card); color: var(--accent-deep); }
-.cell.selected      { background-color: var(--selected); }
+.cell.selected      { background-color: rgb(153, 141, 108); }
 .cell.given.selected{ background: var(--selected); }
-.cell.given.peer    { background: var(--accent-soft); }
+.cell.given.peer    { background-color: none; }
 .cell.peer          { background-color:none; }
 .cell.same-num      { background: var(--same-num); }
 .cell.given.same-num{ background: var(--given-bg); }
