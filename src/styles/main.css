@@ -105,7 +105,7 @@ body {
 .cell.selected      { background-color: var(--selected); }
 .cell.given.selected{ background: var(--selected); }
 .cell.given.peer    { background: var(--accent-soft); }
-.cell.peer          { background-color: rgba(255, 194, 61, 0.87); }
+.cell.peer          { background-color:none; }
 .cell.same-num      { background: var(--same-num); }
 .cell.given.same-num{ background: var(--given-bg); }
 .cell.error         { color: var(--error); background: var(--error-soft); }
