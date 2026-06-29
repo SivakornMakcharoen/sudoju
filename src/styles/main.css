@@ -39,14 +39,19 @@
 
 body {
   margin: 0;
-  background-color:white;
-  background-size: auto, auto, cover;
-  background-position: 0 0, 0 0, center center;
-  background-attachment: fixed;
+  background: linear-gradient(135deg, #8f76a1, #ede8df, #e0cdda, #ceb174);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
   color: var(--ink);
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   padding: 24px 16px 60px;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ── layout ── */
