@@ -130,3 +130,23 @@ body {
 /* ── spinner ── */
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--line-strong); border-top-color: var(--ink); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.cell.has-notes { cursor: pointer; }
+
+.notes-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 1px;
+}
+
+.notes-row {
+  font-size: clamp(0.45rem, 1.5vw, 0.6rem);
+  font-family: var(--font-game);
+  color: var(--ink-mid);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}

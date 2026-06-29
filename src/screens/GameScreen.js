@@ -12,6 +12,7 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
   let timerSec = 0;
   let timerHandle = null;
   let history = [];
+  let notes = {};
 
   // ── DOM skeleton ──────────────────────────────────────────────
   const el = document.createElement('div');
@@ -50,10 +51,11 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
 
   // ── Board component ──────────────────────────────────────────
   const board = Board({
-    getPuzzle: () => puzzle,
-    getGiven: () => given,
+    getPuzzle:   () => puzzle,
+    getGiven:    () => given,
     getSelected: () => selected,
-    onSelect: (r, c) => { selected = { r, c }; board.refresh(); },
+    getNotes:    () => notes,
+    onSelect:    (r, c) => { selected = { r, c }; board.refresh(); },
   });
   el.querySelector('#board-host').replaceWith(board);
 
@@ -62,12 +64,12 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
   el.appendChild(lbModal);
 
   // ── Refs ──────────────────────────────────────────────────────
-  const timerEl = el.querySelector('#stat-timer');
-  const nameEl = el.querySelector('#game-player-name');
-  const badgeEl = el.querySelector('#game-player-badge');
-  const numpadEl = el.querySelector('#numpad');
+  const timerEl   = el.querySelector('#stat-timer');
+  const nameEl    = el.querySelector('#game-player-name');
+  const badgeEl   = el.querySelector('#game-player-badge');
+  const numpadEl  = el.querySelector('#numpad');
   const winOverlay = el.querySelector('#overlay-win');
-  const winText = el.querySelector('#win-text');
+  const winText    = el.querySelector('#win-text');
 
   // ── Timer ─────────────────────────────────────────────────────
   function startTimer() {
@@ -89,6 +91,7 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
       b.addEventListener('click', () => placeNumber(n));
       numpadEl.appendChild(b);
     }
+
     const erase = document.createElement('button');
     erase.className = 'num-btn erase';
     erase.textContent = 'Del';
@@ -100,8 +103,10 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
     undo.textContent = 'Undo';
     undo.addEventListener('click', () => {
       if (!history.length) return;
-      const { r, c, prev } = history.pop();
-      puzzle[r][c] = prev;
+      const { r, c, prevPuzzle, prevNotes } = history.pop();
+      const key = `${r},${c}`;
+      puzzle[r][c] = prevPuzzle;
+      notes[key] = prevNotes;
       board.refresh();
     });
     numpadEl.appendChild(undo);
@@ -112,8 +117,35 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
     if (!selected) return;
     const { r, c } = selected;
     if (given[r][c]) return;
-    history.push({ r, c, prev: puzzle[r][c] });
-    puzzle[r][c] = v;
+
+    const key = `${r},${c}`;
+    const cellNotes = notes[key] || [];
+
+    if (v === 0) {
+      // Del: ลบ note ล่าสุด ถ้าไม่มี note ค่อยลบเลขจริง
+      if (cellNotes.length > 0) {
+        history.push({ r, c, prevPuzzle: puzzle[r][c], prevNotes: [...cellNotes] });
+        notes[key] = cellNotes.slice(0, -1);
+      } else if (puzzle[r][c] !== 0) {
+        history.push({ r, c, prevPuzzle: puzzle[r][c], prevNotes: [] });
+        puzzle[r][c] = 0;
+      }
+    } else if (cellNotes.length > 0) {
+      // มี notes อยู่แล้ว → เพิ่ม note (ถ้าไม่ซ้ำและไม่เกิน 5)
+      if (cellNotes.length >= 5 || cellNotes.includes(v)) return;
+      history.push({ r, c, prevPuzzle: 0, prevNotes: [...cellNotes] });
+      notes[key] = [...cellNotes, v];
+    } else if (puzzle[r][c] !== 0) {
+      // มีเลขจริงอยู่แล้ว กดเลขใหม่ → convert เป็น notes
+      history.push({ r, c, prevPuzzle: puzzle[r][c], prevNotes: [] });
+      notes[key] = [puzzle[r][c], v];
+      puzzle[r][c] = 0;
+    } else {
+      // ช่องว่าง กดเลขครั้งแรก → เลขจริง
+      history.push({ r, c, prevPuzzle: 0, prevNotes: [] });
+      puzzle[r][c] = v;
+    }
+
     board.refresh();
     checkWin();
   }
@@ -149,9 +181,11 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
   function newGame() {
     const g = makePuzzle(player.level);
     solution = g.solution;
-    puzzle = g.puzzle.map(row => row.slice());
-    given = g.given;
+    puzzle   = g.puzzle.map(row => row.slice());
+    given    = g.given;
     selected = null;
+    notes    = {};
+    history  = [];
     timerEl.textContent = '00:00';
     startTimer();
     board.refresh();
@@ -159,9 +193,9 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
 
   // ── Header info ───────────────────────────────────────────────
   function updateHeader() {
-    nameEl.textContent = player.name;
+    nameEl.textContent  = player.name;
     badgeEl.textContent = LEVEL_LABEL[player.level];
-    badgeEl.className = `badge ${player.level}`;
+    badgeEl.className   = `badge ${player.level}`;
   }
 
   // ── Event wiring ──────────────────────────────────────────────
