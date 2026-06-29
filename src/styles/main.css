@@ -39,10 +39,7 @@
 
 body {
   margin: 0;
-  background:
-    repeating-linear-gradient(0deg,   var(--paper-deep) 0 1px, transparent 1px 28px),
-    repeating-linear-gradient(90deg,  var(--paper-deep) 0 1px, transparent 1px 28px),
-    var(--bg-image, var(--paper));
+  background-color:white;
   background-size: auto, auto, cover;
   background-position: 0 0, 0 0, center center;
   background-attachment: fixed;
@@ -113,7 +110,7 @@ body {
 .cell.border-b      { border-bottom: 2.5px solid var(--ink); }
 
 /* ── numpad ── */
-.numpad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 16px; }
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
 .num-btn { background: var(--white); border: 1.5px solid var(--line-strong); border-radius: 3px; padding: 12px 0; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 17px; cursor: pointer; color: var(--ink); }
 .num-btn:hover { background: var(--paper-deep); }
 .num-btn.erase { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; }

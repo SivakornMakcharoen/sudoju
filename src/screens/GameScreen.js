@@ -5,12 +5,13 @@ import { Board } from '../components/Board.js';
 import { LeaderboardModal } from '../components/LeaderboardModal.js';
 
 export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
-  let puzzle      = [];
-  let solution    = [];
-  let given       = [];
-  let selected    = null;
-  let timerSec    = 0;
+  let puzzle = [];
+  let solution = [];
+  let given = [];
+  let selected = null;
+  let timerSec = 0;
   let timerHandle = null;
+  let history = [];
 
   // ── DOM skeleton ──────────────────────────────────────────────
   const el = document.createElement('div');
@@ -31,29 +32,28 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
       <div id="board-host"></div>
       <div class="numpad" id="numpad"></div>
       <div class="controls">
-        <button class="btn ghost small" id="btn-new">เกมใหม่</button>
-        <button class="btn ghost small" id="btn-change-level">เปลี่ยนระดับ</button>
-        <button class="btn ghost small" id="btn-leaderboard">Leaderboard</button>
-        <button class="btn ghost small" id="btn-switch">เปลี่ยนผู้เล่น</button>
+        <button class="btn ghost small" id="btn-new">new game</button>
+        <button class="btn ghost small" id="btn-change-level">change level</button>
+        <button class="btn ghost small" id="btn-switch">switch player</button>
       </div>
     </div>
 
     <!-- win modal -->
     <div class="overlay" id="overlay-win">
       <div class="modal">
-        <h2>เก่งมาก! 🎉</h2>
+        <h2>Congratulations!</h2>
         <p id="win-text" style="font-size:14px;color:var(--ink-soft);"></p>
-        <button class="btn full" id="btn-win-close">เล่นต่อ</button>
+        <button class="btn full" id="btn-win-close">Play Again</button>
       </div>
     </div>
   `;
 
   // ── Board component ──────────────────────────────────────────
   const board = Board({
-    getPuzzle:   () => puzzle,
-    getGiven:    () => given,
+    getPuzzle: () => puzzle,
+    getGiven: () => given,
     getSelected: () => selected,
-    onSelect:    (r, c) => { selected = { r, c }; board.refresh(); },
+    onSelect: (r, c) => { selected = { r, c }; board.refresh(); },
   });
   el.querySelector('#board-host').replaceWith(board);
 
@@ -62,12 +62,12 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
   el.appendChild(lbModal);
 
   // ── Refs ──────────────────────────────────────────────────────
-  const timerEl  = el.querySelector('#stat-timer');
-  const nameEl   = el.querySelector('#game-player-name');
-  const badgeEl  = el.querySelector('#game-player-badge');
+  const timerEl = el.querySelector('#stat-timer');
+  const nameEl = el.querySelector('#game-player-name');
+  const badgeEl = el.querySelector('#game-player-badge');
   const numpadEl = el.querySelector('#numpad');
   const winOverlay = el.querySelector('#overlay-win');
-  const winText    = el.querySelector('#win-text');
+  const winText = el.querySelector('#win-text');
 
   // ── Timer ─────────────────────────────────────────────────────
   function startTimer() {
@@ -91,9 +91,20 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
     }
     const erase = document.createElement('button');
     erase.className = 'num-btn erase';
-    erase.textContent = 'ลบ';
+    erase.textContent = 'Del';
     erase.addEventListener('click', () => placeNumber(0));
     numpadEl.appendChild(erase);
+
+    const undo = document.createElement('button');
+    undo.className = 'num-btn erase';
+    undo.textContent = 'Undo';
+    undo.addEventListener('click', () => {
+      if (!history.length) return;
+      const { r, c, prev } = history.pop();
+      puzzle[r][c] = prev;
+      board.refresh();
+    });
+    numpadEl.appendChild(undo);
   }
 
   // ── Game logic ────────────────────────────────────────────────
@@ -101,6 +112,7 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
     if (!selected) return;
     const { r, c } = selected;
     if (given[r][c]) return;
+    history.push({ r, c, prev: puzzle[r][c] });
     puzzle[r][c] = v;
     board.refresh();
     checkWin();
@@ -115,11 +127,11 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
   }
 
   async function handleWin() {
-    const level    = player.level;
-    const stats    = player.stats[level];
-    stats.played   = (stats.played || 0) + 1;
-    const minOk    = MIN_PLAUSIBLE_SEC[level] ?? 0;
-    let recorded   = true;
+    const level = player.level;
+    const stats = player.stats[level];
+    stats.played = (stats.played || 0) + 1;
+    const minOk = MIN_PLAUSIBLE_SEC[level] ?? 0;
+    let recorded = true;
 
     if (timerSec < minOk) {
       recorded = false;
@@ -137,8 +149,8 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
   function newGame() {
     const g = makePuzzle(player.level);
     solution = g.solution;
-    puzzle   = g.puzzle.map(row => row.slice());
-    given    = g.given;
+    puzzle = g.puzzle.map(row => row.slice());
+    given = g.given;
     selected = null;
     timerEl.textContent = '00:00';
     startTimer();
@@ -147,16 +159,15 @@ export function GameScreen({ player, onChangeLevel, onSwitchPlayer }) {
 
   // ── Header info ───────────────────────────────────────────────
   function updateHeader() {
-    nameEl.textContent  = player.name;
+    nameEl.textContent = player.name;
     badgeEl.textContent = LEVEL_LABEL[player.level];
-    badgeEl.className   = `badge ${player.level}`;
+    badgeEl.className = `badge ${player.level}`;
   }
 
   // ── Event wiring ──────────────────────────────────────────────
   el.querySelector('#btn-new').addEventListener('click', newGame);
   el.querySelector('#btn-change-level').addEventListener('click', () => { stopTimer(); onChangeLevel(); });
   el.querySelector('#btn-switch').addEventListener('click', () => { stopTimer(); onSwitchPlayer(); });
-  el.querySelector('#btn-leaderboard').addEventListener('click', () => lbModal.open());
   el.querySelector('#btn-win-close').addEventListener('click', () => winOverlay.classList.remove('show'));
 
   document.addEventListener('keydown', (e) => {
