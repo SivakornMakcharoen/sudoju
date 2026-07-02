@@ -72,7 +72,7 @@ function App() {
   async function loginWithGoogle() {
     const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: window.location.origin + import.meta.env.BASE_URL },
     });
     if (error) {
       mastheadTag.textContent = `เข้าสู่ระบบไม่สำเร็จ: ${error.message}`;
