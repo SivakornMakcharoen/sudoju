@@ -56,9 +56,15 @@ body {
 
 /* ── layout ── */
 .wrap       { max-width: 560px; margin: 0 auto; }
-.masthead   { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 22px; }
+.masthead   { display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 22px; gap: 12px; }
+.masthead-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .masthead h1 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
 .masthead .tag { font-size: 11px; color: var(--ink-soft); letter-spacing: .12em; text-transform: uppercase; }
+
+#auth-area { flex-shrink: 0; }
+.auth-btn { display: inline-flex; align-items: center; white-space: nowrap; }
+.auth-chip { display: flex; align-items: center; gap: 10px; }
+.auth-chip-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; }
 
 /* ── card ── */
 .card { background: var(--white); border: 1px solid var(--line-strong); border-radius: 4px; box-shadow: 3px 3px 0 var(--line-strong); padding: 22px; margin-bottom: 18px; }
